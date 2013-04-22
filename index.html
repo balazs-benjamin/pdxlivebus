@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Live map of SF MUNI</title>
+    <base target="_new">
+    <style type="text/css">
+      html { height: 100% }
+      body { height: 100%; margin: 0; padding: 0 }
+      #map_canvas { height: 100% }
+      #about { z-index: 9000; position: absolute; right: 25px; top: 60px; background: #eee; font-family: sans-serif; width: 300px; padding: 1em; opacity: 0.85; }
+      #outbound { background-color: #7094FF; }
+      #inbound { background-color: #FF6262; }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKUWfW2xta8wNbky8FjAueV_gkKl_dfa8&sensor=false&language=en"></script>
+    <script src="https://cdn.firebase.com/v0/firebase.js"></script>
+  </head>
+  <body onload="initialize()">
+    <div id="map_canvas" style="width:100%; height:100%"></div>
+    <div id="about">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-via="Firebase" data-size="large">Tweet</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+      <h3>What is this?</h3>
+      <p>This is a web version of the iOS app <a href="https://itunes.apple.com/us/app/sf-live-bus/id617065339?mt=8">SF Live Bus</a>, which shows all of SF MUNI approximately in real-time: <span id="inbound">Inbound</span> &amp; <span id="outbound">Outbound</span>. This version was directly inspired by the <a href="http://traintimes.org.uk/map/tube/">London Underground</a> version that made the rounds a few weeks ago.</p>
+
+      <h3>How does it work?</h3>
+      <p>The NextBus API is hit to fetch the data and populate a <a href="https://www.firebase.com/"><img alt="" src="firebase.png">Firebase</a> endpoint &mdash; making it really easy to consume on the web in real-time. The Firebase related code is about 50 lines of JavaScript on the front end.</p>
+
+      <a href="https://github.com/firebase/firebus/tree/gh-pages"><img alt="" src="http://www.firepad.io/images/download.png"></a>
+    </div>
+    <script src="marker.js"></script>
+    <script src="firebus.js"></script>
+  </body>
+</html>
