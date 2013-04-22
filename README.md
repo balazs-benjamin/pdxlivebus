@@ -1,12 +1,6 @@
-# SF Live Bus 
+# PDX Trimet Buses
 
-The web version of SF Live Bus; this code lives in the gh-pages branch of the `firebus` repo.
-
-![Screenshot](http://i.imgur.com/hZcbs8i.png)
-
-# [Live Demo](http://firebase.github.io/firebus/)
-
-Be sure to check out the [master branch](https://github.com/firebase/firebus)  which contains an iOS version of this same demo!
+Original(https://github.com/firebase/firebus)
 
 ## Licence
 
