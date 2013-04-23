@@ -5,7 +5,7 @@ var Firebase = require('firebase');
 var firebusRef = new Firebase('https://livemet.firebaseio.com/');
 var updateInterval = 200;
 var reapAge = 400;
-var agencyList = [ 'sf-muni' ];
+var agencyList = [ 'port' ];
 
 function reap() {
   var runTs = Date.now() / 1000;
