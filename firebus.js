@@ -36,10 +36,10 @@ f.on("child_changed", function(s) {
 	s.forEach(function(b) {
 		var name = b.name();
 		var busMarker = buses[route + name];
-
+		console.log(busMarker);
 		if (typeof busMarker === 'undefined')
 		{
-			newBus(bus.val(),route,name);
+			newBus(b.val(),route,name);
 		} 
 		else
 		{
