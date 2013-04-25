@@ -56,16 +56,25 @@ function updateFirebaseWithData() {
       {
         result.resultSet.arrival.forEach(function(item){
           var bus = item['$'];
-          var temp = {};
-          console.log(bus['$']);
-          if (bus.route)
-          {
-            var firebaseId = crc.crc32(bus.route + bus.piece + bus.locid);
-            temp.lat = bus.blockPosition.lat;
-            temp.lon = bus.blockPosition.lng;
-            temp.route = bus.route;
-            firebusRef.child('port').child(firebaseId).set(temp);
-          }
+		  if (!!item.blockPosition)
+		  {
+			var block = item.blockPosition[0]['$'];
+			var trips = item.blockPosition[0]['trip'];
+			if (block)
+			{
+				var route = bus.route;
+				var lat = block.lat;
+				var lng = block.lng;
+				if (trips) {
+					trips.forEach(function(trip) {
+						trip = trip['$'];
+						var firebaseId = crc.crc32(route + trip.tripNum);
+						firebusRef.child('port').child(route).child(firebaseId).set({lat:lat,lng:lng});
+					});
+				}
+
+			}
+		  }
         });
       }
     });
