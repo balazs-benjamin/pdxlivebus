@@ -2,35 +2,17 @@ extends layout
 
 block content
 	div(id="map_canvas")
-	script(src="http://ride.trimet.org/rt/ws/V1/vehicles/appID/8EB2B259743166EF7569C6C78/epsg/EPSG:900913/?id=15&reqCount=1", type="text", id="jstest");
-	ul(id="controls")
-		li(class="bus active")
-			a(href="#")
-				img(src="images/bus.png")
-		li(class="max")
-			a(href="#")
-				img(src="images/max.png")
-		li(class="wes")
-			a(href="#")
-				img(src="images/wes.png")
-		li(class="streetcar")
-			a(href="#")
-				img(src="images/streetcar.png")
-		li(class="routes")
-			select(class="routes", id="routes")
-				each route in routes
-					option(value=route.route)= route.name
 	div(id="about")
 		h3 STATUS: 
 			span(class="up") Activeish
 		h3 What is this?
-		p This is an adaptation of <a href="http://www.sflivebus.com/">SFLiveBus</a>. SFLiveBus was directly inspired by the <a href="http://traintimes.org.uk/map/tube/">London Underground</a> version that made the rounds a few weeks ago.
+		p This is an adaptation of <a href="http://www.sflivebus.com/">SFLiveBus</a> for Portland Trimet(public transportation).
 		h3 What is to come?
-		p Select your route, and watch the buses move. Granted it's making ajax calls every 3 seconds. The plan is to keep a list of connected users routes via Socket.IO, and only make necessary trimet api calls. Also reap old buses, and buses you aren't looking at.
-		a(href="https://twitter.com/browniefed") Twitter at me
+		p Buses get updated in sudo real time, what more do you want.
+		p It runs on node, using the <a href="http://firebase.com">Firebase</a> platform on both front/backend.
+		p 
+			a(href="https://twitter.com/browniefed") Twitter at me
 		a(href="https://github.com/browniefed/livemet") 
 			img(alt="Download from GitHub",src="http://www.firepad.io/images/download.png")
 	script(src="javascripts/marker.js")
 	script(src="javascripts/firebus.js")
-	script(src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js")
-	script(src="javascripts/socket.js")

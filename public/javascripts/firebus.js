@@ -1,6 +1,14 @@
 var buses = { };
 var routeMarkers = {};
 var map;
+var routeColor = {
+	'100': {color:'0F6AAC',icon:'train'},
+	'190': {color:'FFC524', icon:'train'},
+	'200': {color:'028953', icon:'train'},
+	'193': {color:'000000', icon:'train'},
+	'194': {color:'000000', icon:'train'},
+	'90': {color:'D31F43', icon:'train'}
+};
 
 function initialize() {
   var mapOptions = {
@@ -14,11 +22,17 @@ function initialize() {
 var d = new Date();
 
 var f = new Firebase("https://livemet.firebaseio.com/routes");
-var fstops = new Firebase('https://livemet.firebaseio.com/triroutes');
+//var fstops = new Firebase('https://livemet.firebaseio.com/triroutes');
 function newBus(bus, busID, routeName) {
     var busLatLng = new google.maps.LatLng(bus.lat, bus.lon);
     var directionColor = "7094FF";
-    var marker = new google.maps.Marker({ icon: 'http://chart.googleapis.com/chart?chst=d_bubble_icon_text_small&chld=bus|bbT|'+routeName+'|' + directionColor + '|eee', position: busLatLng, map: map });
+    var iconType = 'bus';
+    if (routeColor[routeName])
+    {
+    	directionColor = routeColor[routeName].color;
+    	iconType = routeColor[routeName].icon;
+    }
+    var marker = new google.maps.Marker({ icon: 'http://chart.googleapis.com/chart?chst=d_bubble_icon_text_small&chld=' + iconType + '|bbT|'+routeName+'|' + directionColor + '|eee', position: busLatLng, map: map });
     buses[routeName + busID] = marker;
 }
 /*
@@ -32,7 +46,7 @@ function newStop(stop, routeName)
     }
     routeMarkers[routeName].push(marker);
 }*/
-
+/*
 fstops.once('value', function(s)
 {
 	var routes = [];
@@ -43,11 +57,9 @@ fstops.once('value', function(s)
 		{
 			newStop(data.val(),routeName);
 		});
-		console.log(routes.length);
 	});
-	console.log(routeMarkers);
 })
-
+*/
 
 f.once("value", function(s) {
 
