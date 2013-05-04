@@ -33,6 +33,7 @@ color:#FF6262;
 	padding: 0;
 	bottom:0;
 	left:0;
+	display: none;
 }
 #controls li {
 	float:left;

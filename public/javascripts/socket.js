@@ -23,5 +23,3 @@ function updateMap() {
 }
 
 //routeSelection.addEventListener('change', emitRoute);
-
-setInterval(updateMap, 3000);

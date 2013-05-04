@@ -14,7 +14,7 @@ function initialize() {
 var d = new Date();
 
 var f = new Firebase("https://livemet.firebaseio.com/routes");
-//var fstops = new Firebase('https://livemet.firebaseio.com/triroutes');
+var fstops = new Firebase('https://livemet.firebaseio.com/triroutes');
 function newBus(bus, busID, routeName) {
     var busLatLng = new google.maps.LatLng(bus.lat, bus.lon);
     var directionColor = "7094FF";
@@ -32,19 +32,22 @@ function newStop(stop, routeName)
     }
     routeMarkers[routeName].push(marker);
 }*/
-/*
+
 fstops.once('value', function(s)
 {
+	var routes = [];
 	s.forEach(function(route){
 		var routeName = route.name();
+		routes.push(routeName);
 		route.child('stops').forEach(function(data)
 		{
 			newStop(data.val(),routeName);
-		})
+		});
+		console.log(routes.length);
 	});
 	console.log(routeMarkers);
 })
-*/
+
 
 f.once("value", function(s) {
 
