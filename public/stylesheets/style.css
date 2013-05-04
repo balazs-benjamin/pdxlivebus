@@ -1,0 +1,74 @@
+html { height: 100% }
+@keyframes fadeinop {
+	0% {
+		opacity: .7;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+@keyframes fadeincol {
+	0% {
+		background: #eee;
+	}
+	100% {
+		background: #ccc;
+	}
+}
+body { height: 100%; margin: 0; padding: 0;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+#map_canvas { height: 100%; width:100%; }
+#outbound { background-color: #7094FF; }
+#inbound { background-color: #FF6262; }
+#about { z-index: 9000; position: absolute; right: 25px; top: 60px; background: #eee; font-family: sans-serif; width: 300px; padding: 1em; opacity: 0.85; }
+.down {
+color:#FF6262;
+}
+.up {
+	color:#7094FF;
+}
+#controls
+{
+	position: absolute;
+	margin:0;
+	padding: 0;
+	bottom:0;
+	left:0;
+}
+#controls li {
+	float:left;
+	display: inline-block;
+	min-width:50px;
+	height:30px;
+	padding:5px;
+	background: #eee;
+	border: 1px solid #333;
+}
+#controls li:hover, #controls li.active {
+	background:#ccc;
+	animation: fadeincol .5s;
+}
+#controls li select
+{
+	margin-top: 5px;
+}
+#controls li img {
+	display: block;
+	margin:0 auto;
+	opacity: 0.7;
+}
+#controls li:hover img, #controls li.active img
+{
+	opacity: 1;
+	animation:fadeinop .5s;
+}
+
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+	#about 
+	{
+		display:none;
+	}
+	#controls
+	{
+		width: 100%;
+	}
+}
