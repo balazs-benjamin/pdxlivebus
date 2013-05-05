@@ -47,38 +47,41 @@ var trimetRoutes = ["1", "10", "100", "103", "11", "12", "14", "15", "152", "154
 
 function proxycall()
 {
-  async.map(trimetRoutes, queryTrimet, function(err, results)
-  {
-    results.forEach(function(item) {
-      var jsRes = JSON.parse(item.resp);
-      jsRes.features.forEach(function(bus)
-      {
-        var temp = {};
-        temp.busID = bus.properties.vehicleNumber;
-        temp.tripNumber = bus.properties.tripNumber;
-        temp.lat = bus.properties.lat;
-        temp.lon = bus.properties.lon;
-        temp.route = bus.properties.routeNumber;
-        fbref.child('routes').child(temp.route).child(temp.busID).set(temp);
-      })
-    });
-  }); 
-
+  queryTrimet(processResults);
 }
 
-function queryTrimet(route, cb) {
+function processResults (results)
+{
+  if (results) { 
+    JSON.parse(results).features.forEach(function(bus)
+    {
+      var temp = {};
+      temp.busID = bus.properties.vehicleNumber;
+      temp.lat = bus.properties.lat;
+      temp.lon = bus.properties.lon;
+      temp.route = bus.properties.routeNumber;
+      fbref.child('routes').child(temp.busID).set(temp);
+      temp = null;
+    });
+  } else
+  {
+    console.log(results);
+  }
+};
+function queryTrimet(cb) {
   var d = new Date(),
-  rUrl = 'http://ride.trimet.org/rt/ws/V1/vehicles/appID/8EB2B259743166EF7569C6C78/epsg/EPSG:900913/?id=' + route + '&reqTime=' + d.getTime() + '&reqCount=1';
+  rUrl = 'http://ride.trimet.org/rt/ws/V1/vehicles/appID/8EB2B259743166EF7569C6C78/epsg/EPSG:900913/?id=' + trimetRoutes.join(',') + '&reqTime=' + d.getTime() + '&reqCount=1';
   request(rUrl, function(err, resp, body)
   {
     if (err)
     {
-      cb(err);
+      console.log(err);
     }
-    console.log(rUrl);
-    cb(null,{route:route, resp: body});
+    d = null;
+    cb(body);
   });
 }
+//proxycall();
 
 setInterval((function() {
   proxycall();
