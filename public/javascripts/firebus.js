@@ -29,7 +29,8 @@ function newBus(bus) {
     var busLatLng = new google.maps.LatLng(bus.lat, bus.lon),
     directionColor = "7094FF",
     routeText = bus.route,
-    busID = bus.busID;
+    busID = bus.busID,
+    destination = bus.destination;
 
     if (routeMods[bus.route])
     {
@@ -37,7 +38,32 @@ function newBus(bus) {
     	routeText = routeMods[routeText].text;
     }
     var marker = new google.maps.Marker({ icon: 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bbT|'+routeText+'|' + directionColor + '|eee', position: busLatLng, map: map });
-    buses[busID] = marker;
+    google.maps.event.addListener(marker, 'click', function()
+    {
+		//var stopInfo = buses[busID].info,
+		var content = 'Route: ' + buses[busID].info.route + '<br>' + buses[busID].info.destination;
+		if (!buses[busID].contentWindow) {
+		  var infowindow = new google.maps.InfoWindow({
+		    content: content,
+		    position: busLatLng
+		  });
+		  buses[busID].contentWindow = infowindow;
+		}
+		buses[busID].contentWindow.setContent(content);
+		buses[busID].contentWindow.open(map);
+    });
+
+    google.maps.event.addListener(marker, 'mouseover', function()
+    {
+
+    });
+    google.maps.event.addListener(marker, 'mouseout', function()
+    {
+
+    })
+    buses[busID] = {};
+    buses[busID].marker = marker;
+    buses[busID].info = bus;
 }
 
 f.once("value", function(s) {
@@ -49,7 +75,8 @@ f.once("value", function(s) {
 
 f.on("child_changed", function(s) {
 	var name = s.name(),
-	busMarker = buses[name];
+	busMarker = buses[name].marker,
+	infoWindow = buses[name].contentWindow;
 
 	if (typeof busMarker === 'undefined')
 	{
@@ -57,15 +84,32 @@ f.on("child_changed", function(s) {
 	} 
 	else
 	{
+		buses[name].info = s.val();
 		busMarker.animatedMoveTo(s.val().lat,s.val().lon);
+		if (infoWindow)
+		{
+			var content = 'Route: ' + s.val().route + '<br>' + s.val().destination,
+			infoPosition = new google.maps.LatLng(s.val().lat, s.val().lon);
+
+			infoWindow.setContent(content);
+			infoWindow.animatedMoveTo(s.val().lat, s.val().lon);
+			//infoWindow.setPosition(infoPosition);
+		}
 	}
 });
 
 f.on("child_removed", function(s) {
 	var name = s.name(),
-	busMarker = buses[name];
+	busMarker = buses[name].marker,
+	infoWindow = buses[name].contentWindow;
+
 	if (typeof busMarker !== 'undefined') {
 		busMarker.setMap(null);
+		if (infoWindow)
+		{
+			infoWindow.setMap(null);
+		}
+		//Probably shouldn't delete, just need to splice it out for GC to work
 		delete buses[name];
 	}
 });

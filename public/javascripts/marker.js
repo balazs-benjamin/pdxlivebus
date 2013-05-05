@@ -4,7 +4,10 @@ function feq (f1, f2) {
 
 // hack to animated/move the Marker class -vikrum
 // based on http://stackoverflow.com/a/10906464
-google.maps.Marker.prototype.animatedMoveTo = function(toLat, toLng) {
+google.maps.Marker.prototype.animatedMoveTo = animatedMoveTo;
+google.maps.InfoWindow.prototype.animatedMoveTo = animatedMoveTo;
+
+function animatedMoveTo(toLat, toLng) {
   var fromLat = this.getPosition().lat();
   var fromLng = this.getPosition().lng();
   if(feq(fromLat, toLat) && feq(fromLng, toLng))
