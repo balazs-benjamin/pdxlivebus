@@ -3,8 +3,7 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , Firebase = require('firebase')
-  , request = require('request')
-  , async = require('async');
+  , request = require('request');
  
   var fbref = new Firebase('https://livemet.firebaseio.com/');
   var updateInterval = 10000;
@@ -81,7 +80,6 @@ function queryTrimet(cb) {
     cb(body);
   });
 }
-//proxycall();
 
 setInterval((function() {
   proxycall();
