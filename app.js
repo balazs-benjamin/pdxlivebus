@@ -6,7 +6,7 @@ var express = require('express')
   , request = require('request');
  
   var fbref = new Firebase('https://livemet.firebaseio.com/');
-  var updateInterval = 10000;
+  var updateInterval = 6000;
   var app = express();
 
 

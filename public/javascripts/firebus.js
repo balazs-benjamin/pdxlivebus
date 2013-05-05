@@ -12,8 +12,8 @@ var routeMods = {
 
 function initialize() {
 	var mapOptions = {
-	center: new google.maps.LatLng(45.52355,-122.675808),
-	zoom: 15,
+	center: new google.maps.LatLng(45.525292,-122.668197),
+	zoom: 13,
 	mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
@@ -41,7 +41,6 @@ function newBus(bus) {
 }
 
 f.once("value", function(s) {
-
   s.forEach(function(b) {
 	var name = b.name();
 	newBus(b.val());
@@ -70,3 +69,44 @@ f.on("child_removed", function(s) {
 		delete buses[name];
 	}
 });
+
+var about = (function(toggleid, id)
+{
+	var eToggle = document.getElementById(toggleid),
+	eShow = document.getElementById(id);
+	function init()
+	{
+		var children = eShow.children,
+		childrenLength = children.length;
+		eShow.style.display = 'none';
+		eToggle.addEventListener('click', toggle);
+		for(var i = 0; i < childrenLength; i++) {
+			if (children[i].className.indexOf('close') !== -1)
+			{
+				children[i].addEventListener('click', toggle);
+				break;
+			}
+		}
+	}
+
+	function toggle(e)
+	{
+		about.setStyle((about.getHidden() ? 'block' : 'none'));
+		e.preventDefault();
+	}
+	function getHidden()
+	{
+		return eShow.style.display === 'none' ? true : false;
+	}
+	function setStyle(style)
+	{
+		eShow.style.display = style;
+	}
+
+	return {
+		init: init,
+		getHidden: getHidden,
+		setStyle: setStyle
+	}
+}('abouttog','about'));
+about.init();

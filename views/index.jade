@@ -2,9 +2,11 @@ extends layout
 
 block content
 	div(id="map_canvas")
+	a(id="abouttog", href="#") About
 	div(id="about")
+		a(class="close")[X]
 		h3 STATUS: 
-			span(class="down") DOWN FOR UPDATES
+			span(class="up") Active
 		h3 What is this?
 		p This is an adaptation of <a href="http://www.sflivebus.com/">SFLiveBus</a> for Portland Trimet(public transportation).
 		h3 What is to come?
