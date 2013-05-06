@@ -59,6 +59,14 @@ function processResults (results)
       temp.lat = bus.properties.lat;
       temp.lon = bus.properties.lon;
       temp.route = bus.properties.routeNumber;
+      if (bus.properties.tripNumber) {
+        temp.tripnumber = bus.properties.tripNumber;
+      }
+      if (bus.properties.block)
+      {
+        temp.block = bus.properties.block;
+      }
+
       temp.destination = bus.properties.destination || '';
       fbref.child('routes').child(temp.busID).set(temp);
       temp = null;

@@ -31,6 +31,10 @@ function newBus(bus) {
     routeText = bus.route,
     busID = bus.busID,
     destination = bus.destination;
+    //SET BUS INFO HERE
+    buses[busID] = {};
+
+    buses[busID].info = bus;
 
     if (routeMods[bus.route])
     {
@@ -41,7 +45,8 @@ function newBus(bus) {
     google.maps.event.addListener(marker, 'click', function()
     {
 		//var stopInfo = buses[busID].info,
-		var content = 'Route: ' + buses[busID].info.route + '<br>' + buses[busID].info.destination;
+		var  block = '<br>Block:' + buses[busID].info.block || '';
+		var content = 'Route: ' + buses[busID].info.route + '<br>Vehicle #: ' + busID +  block + '<br>' + buses[busID].info.destination;
 		if (!buses[busID].contentWindow) {
 		  var infowindow = new google.maps.InfoWindow({
 		    content: content,
@@ -61,16 +66,109 @@ function newBus(bus) {
     {
 
     })
-    buses[busID] = {};
     buses[busID].marker = marker;
-    buses[busID].info = bus;
 }
+
+
+var filter = (function() {
+
+	var eSearch = document.getElementById('search'),
+	eClear = document.getElementById('clear'),
+	showBuses = {},
+	currentBuses = {};
+
+	function init()
+	{
+		eClear.addEventListener('click', clear);
+		eSearch.addEventListener('keyup', applyFilter);
+	}
+
+	function applyFilter(e)
+	{
+		var busList = filter.getCurrentBuses(),
+		query = filter.getSearch().value;
+		if (query.length === 0)
+		{
+			for(bus in busList)
+			{
+				filter.setBus(bus,true);
+				busList[bus].marker.setVisible(true);
+			}
+			return false;
+		}
+
+		for(bus in busList)
+		{
+			var param = busList[bus].info;
+			if (param.route == query || param.busID == query || param.block == query)
+			{
+				filter.setBus(bus,true);
+				busList[bus].marker.setVisible(true);
+			}
+			else
+			{
+				filter.setBus(bus,false);
+				busList[bus].marker.setVisible(false);
+			}
+		}
+	}
+
+	function clear(e)
+	{
+		filter.clearSearch();
+		filter.applyFilter();
+		e.preventDefault();
+	}
+
+	function getSearch()
+	{
+		return eSearch;
+	}
+
+	function clearSearch() {
+		eSearch.value = '';
+	}
+
+	function getBuses() 
+	{
+		return showBuses;
+	}
+	function getCurrentBuses()
+	{
+		return currentBuses;
+	}
+	function setBus(bus, toggle)
+	{
+	 	if (showBuses[bus] === 'undefined')
+	 	{
+	 		showBuses[bus] = {};
+	 	}
+	 	showBuses[bus] = toggle;
+	}
+	function setBuses(buses)
+	{
+		currentBuses = buses;
+	}
+	return {
+		init:init,
+		clearSearch: clearSearch,
+		getBuses: getBuses,
+		setBuses: setBuses,
+		getCurrentBuses: getCurrentBuses,
+		setBus: setBus,
+		getSearch: getSearch,
+		applyFilter: applyFilter
+	}
+}());
+
+filter.init();
 
 f.once("value", function(s) {
   s.forEach(function(b) {
 	var name = b.name();
 	newBus(b.val());
   });
+  filter.setBuses(buses);
 });
 
 f.on("child_changed", function(s) {
@@ -85,17 +183,21 @@ f.on("child_changed", function(s) {
 	else
 	{
 		buses[name].info = s.val();
-		busMarker.animatedMoveTo(s.val().lat,s.val().lon);
 		if (infoWindow)
 		{
-			var content = 'Route: ' + s.val().route + '<br>' + s.val().destination,
-			infoPosition = new google.maps.LatLng(s.val().lat, s.val().lon);
+			var  block = '<br>Block:' + s.val().block || '';
 
+			var content = 'Route: ' + s.val().route + '<br>Vehicle #: ' + name + block + '<br>' + s.val().destination,
+			infoPosition = new google.maps.LatLng(s.val().lat, s.val().lon);
+			infoWindow.setPosition(infoPosition);
 			infoWindow.setContent(content);
-			infoWindow.animatedMoveTo(s.val().lat, s.val().lon);
-			//infoWindow.setPosition(infoPosition);
+			//infoWindow.animatedMoveTo(s.val().lat, s.val().lon);
 		}
+
+		busMarker.animatedMoveTo(s.val().lat,s.val().lon);
 	}
+
+	filter.setBuses(buses);
 });
 
 f.on("child_removed", function(s) {
