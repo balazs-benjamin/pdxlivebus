@@ -9,7 +9,7 @@ var routeMods = {
 	'194': {color:'000000',  text: 'SC'},
 	'90': {color:'D31F43', text:'MAX'},
 	'921': {color:'F54B00', text: 'G'},
-	'922': {color:'F54B00', text: 'G'}
+	'922': {color:'F54B00', text: 'DH'}
 };
 
 function initialize() {
