@@ -7,7 +7,9 @@ var routeMods = {
 	'200': {color:'028953', text: 'MAX'},
 	'193': {color:'000000',  text: 'SC'},
 	'194': {color:'000000',  text: 'SC'},
-	'90': {color:'D31F43', text:'MAX'}
+	'90': {color:'D31F43', text:'MAX'},
+	'921': {color:'F54B00', text: 'G'},
+	'922': {color:'F54B00', text: 'G'}
 };
 
 function initialize() {
@@ -42,20 +44,18 @@ function newBus(bus) {
     	routeText = routeMods[routeText].text;
     }
     var marker = new google.maps.Marker({ icon: 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bbT|'+routeText+'|' + directionColor + '|eee', position: busLatLng, map: map });
+
+
+	var  block = '<br>Block:' + buses[busID].info.block || '';
+	var content = 'Route: ' + buses[busID].info.route + '<br>Vehicle #: ' + busID +  block + '<br>' + buses[busID].info.destination;
+    var infowindow = new google.maps.InfoWindow({content: content,position: busLatLng});
+	
+	buses[busID].contentWindow = infowindow;
+	//buses[busID].contentWindow.setContent(content);
+   
     google.maps.event.addListener(marker, 'click', function()
     {
-		//var stopInfo = buses[busID].info,
-		var  block = '<br>Block:' + buses[busID].info.block || '';
-		var content = 'Route: ' + buses[busID].info.route + '<br>Vehicle #: ' + busID +  block + '<br>' + buses[busID].info.destination;
-		if (!buses[busID].contentWindow) {
-		  var infowindow = new google.maps.InfoWindow({
-		    content: content,
-		    position: busLatLng
-		  });
-		  buses[busID].contentWindow = infowindow;
-		}
-		buses[busID].contentWindow.setContent(content);
-		buses[busID].contentWindow.open(map);
+    	buses[busID].contentWindow.open(map);
     });
 
     google.maps.event.addListener(marker, 'mouseover', function()
@@ -173,9 +173,7 @@ f.once("value", function(s) {
 
 f.on("child_changed", function(s) {
 	var name = s.name(),
-	busMarker = buses[name].marker,
-	infoWindow = buses[name].contentWindow;
-
+	busMarker = buses[name].marker;
 	if (typeof busMarker === 'undefined')
 	{
 		newBus(s.val());
@@ -183,17 +181,24 @@ f.on("child_changed", function(s) {
 	else
 	{
 		buses[name].info = s.val();
-		if (infoWindow)
+		if (buses[name].contentWindow)
 		{
 			var  block = '<br>Block:' + s.val().block || '';
-
 			var content = 'Route: ' + s.val().route + '<br>Vehicle #: ' + name + block + '<br>' + s.val().destination,
 			infoPosition = new google.maps.LatLng(s.val().lat, s.val().lon);
-			infoWindow.setPosition(infoPosition);
-			infoWindow.setContent(content);
-			//infoWindow.animatedMoveTo(s.val().lat, s.val().lon);
+			//buses[name].contentWindow.setPosition(infoPosition);
+			buses[name].contentWindow.setContent(content);
+			buses[name].contentWindow.animatedMoveTo(s.val().lat, s.val().lon);
 		}
-
+		//UPDATE MARKER ICON IF BUS ROUTE CHANGES
+		var routeText = s.val().route,
+		directionColor = '7094FF';
+		if (routeMods[s.val().route])
+	    {
+	    	directionColor = routeMods[routeText].color;
+	    	routeText = routeMods[routeText].text;
+	    }
+		busMarker.setIcon('http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bbT|'+routeText+'|' + directionColor + '|eee');
 		busMarker.animatedMoveTo(s.val().lat,s.val().lon);
 	}
 
