@@ -1,15 +1,41 @@
-var express = require('express')
+ var express = require('express')
   , routes = require('./routes')
+  , fs = require('fs')
   , http = require('http')
   , path = require('path')
   , Firebase = require('firebase')
-  , request = require('request');
+  , request = require('request')
+  , xml2js = require('xml2js');
+  
  
   var fbref = new Firebase('https://livemet.firebaseio.com/');
-  var updateInterval = 6000;
+  var updateInterval = 5000;
   var app = express();
+  var config = {
+   appid: ''
+  };
 
+function loadConfig() {
+  var env = process.env
+  
+  if (!env.NODE_ENV || env.NODE_ENV == 'development'){
+    // desktop dev
+    var data = fs.readFileSync('./config.json')
+    try {
+      config = JSON.parse(data);
+    } catch (err) {
+      console.log('There has been an error parsing your config.JSON.')
+      console.log(err);
+    }
+  }
+  else
+  {
+    console.log('CANNOT LOAD CONFIG!');
+  }
+}
 
+loadConfig()
+console.log(config.appid);
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -42,51 +68,78 @@ io.sockets.on('connection', function (socket) {
 });
 
 /*All trimet route #s*/
-var trimetRoutes = ["1", "10", "100", "103", "11", "12", "14", "15", "152", "154", "155", "156", "16", "17", "18", "19", "190", "193", "194", "198", "20", "200", "203", "208", "21", "22", "23", "24", "25", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "4", "43", "44", "45", "46", "47", "48", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "6", "61", "62", "63", "64", "65", "66", "67", "68", "70", "71", "72", "75", "76", "77", "78", "79", "8", "80", "81", "83", "84", "85", "87", "88", "9", "90", "92", "93", "94", "96", "98", "99", "921", "922"];
+//var trimetRoutes = ["1", "10", "100", "103", "11", "12", "14", "15", "152", "154", "155", "156", "16", "17", "18", "19", "190", "193", "194", "198", "20", "200", "203", "208", "21", "22", "23", "24", "25", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "4", "43", "44", "45", "46", "47", "48", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "6", "61", "62", "63", "64", "65", "66", "67", "68", "70", "71", "72", "75", "76", "77", "78", "79", "8", "80", "81", "83", "84", "85", "87", "88", "9", "90", "92", "93", "94", "96", "98", "99"]; //, "921", "922"
 
 function proxycall()
 {
   queryTrimet(processResults);
 }
 
-function processResults (results)
+function processResults (results, scresults)
 {
   if (results) { 
-    JSON.parse(results).features.forEach(function(bus)
+    JSON.parse(results).resultSet.vehicle.forEach(function(bus)
     {
       var temp = {};
-      temp.busID = bus.properties.vehicleNumber;
-      temp.lat = bus.properties.lat;
-      temp.lon = bus.properties.lon;
-      temp.route = bus.properties.routeNumber;
-      if (bus.properties.tripNumber) {
-        temp.tripnumber = bus.properties.tripNumber;
-      }
-      if (bus.properties.block)
+      if ( (bus.vehicleID && bus.routeNumber && bus.routeNumber != '921' && bus.routeNumber != '922'))
       {
-        temp.block = bus.properties.block;
-      }
+        temp.busID = bus.vehicleID;
+        temp.lat = bus.latitude;
+        temp.lon = bus.longitude;
+        temp.route = bus.routeNumber;
+        temp.direction = bus.direction;
+        temp.expires = bus.expires;
+        if (bus.tripID) {
+          temp.tripnumber = bus.tripID;
+        }
+        if (bus.blockID)
+        {
+          temp.block = bus.blockID;
+        }
 
-      temp.destination = bus.properties.destination || '';
-      fbref.child('routes').child(temp.busID).set(temp);
+        temp.destination = bus.signMessageLong || '';
+        fbref.child('port').child(temp.busID).set(temp);
+      }
       temp = null;
     });
   } else
   {
     console.log(results);
   }
+  if (scresults)
+  {
+    
+  }
+  else
+  {
+    console.log(scresults);
+  }
 };
 function queryTrimet(cb) {
+    console.log(config.appid);
   var d = new Date(),
-  rUrl = 'http://ride.trimet.org/rt/ws/V1/vehicles/appID/8EB2B259743166EF7569C6C78/epsg/EPSG:900913/?id=' + trimetRoutes.join(',') + '&reqTime=' + d.getTime() + '&reqCount=1';
+  rUrl = 'http://developer.trimet.org/beta/v2/vehicles?appid=' + config.appid + '&showNonRevenue=false';
+  rSCUrl = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=portland-sc&t=' + d.getTime();
   request(rUrl, function(err, resp, body)
   {
-    if (err)
-    {
-      console.log(err);
-    }
     d = null;
-    cb(body);
+	if (!err && resp.statusCode == 200) {
+    request(rSCUrl, function(scerr, scresp, scbody)
+    {
+        if (!scerr && scresp.statusCode == 200) {
+          cb(body,scbody);
+        }
+        else
+        {
+          cb(body,null);
+        }
+    });
+	}
+	else
+	{
+		console.log(err);
+		console.log(resp.statusCode);
+	}
   });
 }
 

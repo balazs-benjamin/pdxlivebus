@@ -1,263 +1,154 @@
-var buses = { };
-var routeMarkers = {};
-var map;
-var routeMods = {
-	'100': {color:'0F6AAC', text: 'MAX'},
-	'190': {color:'FFC524', text: 'MAX'},
-	'200': {color:'028953', text: 'MAX'},
+//MISC JS LOAD
+//TWITTER
+!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+
+var pdxlivebus = (function(window, document, Firebase, L,  undefined)
+{
+
+	var buses = {};
+	map = {},
+	markers = {},
+	routeMods = {
+	'100': {color:'blue-max train', text: 'MAX'},
+	'190': {color:'yellow-max train', text: 'MAX'},
+	'200': {color:'green-max train', text: 'MAX'},
 	'193': {color:'000000',  text: 'SC'},
 	'194': {color:'000000',  text: 'SC'},
-	'90': {color:'D31F43', text:'MAX'},
-	'921': {color:'F54B00', text: 'G'},
-	'922': {color:'F54B00', text: 'DH'}
-};
-
-function initialize() {
-	var mapOptions = {
-	center: new google.maps.LatLng(45.525292,-122.668197),
-	zoom: 13,
-	mapTypeId: google.maps.MapTypeId.ROADMAP
-	};
-	map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-
-	var transitLayer = new google.maps.TransitLayer();
-	transitLayer.setMap(map);
-}
-
-var d = new Date();
-
-var f = new Firebase("https://livemet.firebaseio.com/routes");
-function newBus(bus) {
-    var busLatLng = new google.maps.LatLng(bus.lat, bus.lon),
-    directionColor = "7094FF",
-    routeText = bus.route,
-    busID = bus.busID,
-    destination = bus.destination;
-    //SET BUS INFO HERE
-    buses[busID] = {};
-
-    buses[busID].info = bus;
-
-    if (routeMods[bus.route])
-    {
-    	directionColor = routeMods[routeText].color;
-    	routeText = routeMods[routeText].text;
-    }
-    var marker = new google.maps.Marker({ icon: 'http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bbT|'+routeText+'|' + directionColor + '|eee', position: busLatLng, map: map });
-
-
-	var  block = '<br>Block:' + buses[busID].info.block || '';
-	var content = 'Route: ' + buses[busID].info.route + '<br>Vehicle #: ' + busID +  block + '<br>' + buses[busID].info.destination;
-    var infowindow = new google.maps.InfoWindow({content: content,position: busLatLng});
+	'90': {color:'red-max train', text:'MAX'}
+	},
+	center = new L.LatLng(45.525292,-122.668197),
+	toggles = {
+		bus: {ele: document.getElementById('show-buses'), status: 1, cb: filterVehicles},
+		max: {ele: document.getElementById('show-max'), status: 1, cb: filterVehicles},
+		sc: {ele: document.getElementById('show-sc'), status: 1, cb: filterVehicles}
+	},
+	firebase = new Firebase("https://livemet.firebaseio.com/port");
+	function init()
+	{
+		//INITIATE MAP
+		map = L.map('map_canvas', {attributionControl: false, zoomControl: false, fadeAnimation: false}).setView(center, 13);
+		L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+		new L.Control.Attribution({position: 'bottomright'}).addAttribution('&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors. Data provided by <a href="http://trimet.org">TriMet</a>').addTo(map);
 	
-	buses[busID].contentWindow = infowindow;
-	//buses[busID].contentWindow.setContent(content);
-   
-    google.maps.event.addListener(marker, 'click', function()
-    {
-    	buses[busID].contentWindow.open(map);
-    });
-
-    google.maps.event.addListener(marker, 'mouseover', function()
-    {
-
-    });
-    google.maps.event.addListener(marker, 'mouseout', function()
-    {
-
-    })
-    buses[busID].marker = marker;
-}
-
-
-var filter = (function() {
-
-	var eSearch = document.getElementById('search'),
-	eClear = document.getElementById('clear'),
-	showBuses = {},
-	currentBuses = {};
-
-	function init()
-	{
-		eClear.addEventListener('click', clear);
-		eSearch.addEventListener('keyup', applyFilter);
-	}
-
-	function applyFilter(e)
-	{
-		var busList = filter.getCurrentBuses(),
-		query = filter.getSearch().value;
-		if (query.length === 0)
+		//BIND FIREBASE
+		firebase.once('value', newVehicle);
+		firebase.on('child_changed', updateVehicle);
+		firebase.on('child_removed', removeVehicle);
+		for (toggle in toggles)
 		{
-			for(bus in busList)
-			{
-				filter.setBus(bus,true);
-				busList[bus].marker.setVisible(true);
-			}
-			return false;
-		}
-
-		for(bus in busList)
-		{
-			var param = busList[bus].info;
-			if (param.route == query || param.busID == query || param.block == query)
-			{
-				filter.setBus(bus,true);
-				busList[bus].marker.setVisible(true);
-			}
-			else
-			{
-				filter.setBus(bus,false);
-				busList[bus].marker.setVisible(false);
-			}
+			addEvent(toggles[toggle].ele, 'click', toggles[toggle].cb);
 		}
 	}
-
-	function clear(e)
+	function filterVehicles(e)
 	{
-		filter.clearSearch();
-		filter.applyFilter();
+		toggleSelected(this);
 		e.preventDefault();
 	}
-
-	function getSearch()
+	function addEvent(html_element, event_name, event_function) 
+	{       
+		if(html_element.attachEvent) 
+		{
+		  html_element.attachEvent("on" + event_name, function() {event_function.call(html_element);}); 
+		}
+		else if(html_element.addEventListener) 
+		{
+		  html_element.addEventListener(event_name, event_function, false);
+		}
+	}
+	function toggleSelected(ele)
 	{
-		return eSearch;
+		if (ele.className.indexOf('selected') === -1)
+		{
+			ele.className += ' selected';
+		}
+		else
+		{
+			ele.className = ele.className.replace(/selected/gi,'');
+		}
 	}
 
-	function clearSearch() {
-		eSearch.value = '';
+	function newVehicle(s)
+	{
+		s.forEach(function(b)
+		{
+			createVehicle(b.name(), b.val());
+		});
 	}
 
-	function getBuses() 
+	function createVehicle(name, vehicle)
 	{
-		return showBuses;
+		buses[name] = buses[name] || {};
+		if (!routeMods[vehicle.route])
+		{
+			var classDirection = (vehicle.direction == 1 ? 'inbound' : 'outbound'),
+			displayText = vehicle.route;
+		}
+		else
+		{
+			var classDirection = routeMods[vehicle.route].color,
+			displayText = routeMods[vehicle.route].text;
+		}
+
+		var markerLocation = new L.LatLng(vehicle.lat, vehicle.lon),
+		icon = L.divIcon({className: 'busmarker ' + classDirection, html: '<span>' + displayText + '</span>'}),
+		marker = new L.Marker(markerLocation,{icon:icon}).addTo(map);
+		marker.on('click', trackVehicle);
+		marker.on('move', trackVehicle);
+		buses[name].marker = marker;
+		buses[name].info = vehicle;
 	}
-	function getCurrentBuses()
+
+	function trackVehicle(m)
 	{
-		return currentBuses;
+		map.panTo(m.target._latlng);
+		map.setZoom(16);
 	}
-	function setBus(bus, toggle)
+
+	function removeVehicle(s)
 	{
-	 	if (showBuses[bus] === 'undefined')
-	 	{
-	 		showBuses[bus] = {};
-	 	}
-	 	showBuses[bus] = toggle;
+		var name = s.name(),
+		busMarker = buses[name].marker;
+
+		if (busMarker) {
+			map.removeLayer(busMarker);
+			buses[name] = null;
+		}
 	}
-	function setBuses(buses)
+
+	function updateVehicle(s)
 	{
-		currentBuses = buses;
+		var name = s.name();
+		if (!buses[name])
+		{
+			createVehicle(name, s.val());
+		} 
+		else
+		{
+			var busMarker = buses[name].marker;
+			buses[name].info = s.val();
+
+			var toLocation = new L.LatLng(s.val().lat, s.val().lon),
+			fromLocation = busMarker.getLatLng(),
+			chunked = chunLats([toLocation, fromLocation]);
+
+			animateMarker(busMarker, chunked);
+			/*var point = map.latLngToLayerPoint(location);
+			var fx = new L.PosAnimation();
+			fx.run(busMarker._icon, point, .25);*/
+		}
+
+	}
+
+	
+
+	function moveVehicle()
+	{
+
 	}
 	return {
-		init:init,
-		clearSearch: clearSearch,
-		getBuses: getBuses,
-		setBuses: setBuses,
-		getCurrentBuses: getCurrentBuses,
-		setBus: setBus,
-		getSearch: getSearch,
-		applyFilter: applyFilter
-	}
-}());
+		init: init
+	};
 
-filter.init();
+}(window, document, Firebase, L));
 
-f.once("value", function(s) {
-  s.forEach(function(b) {
-	var name = b.name();
-	newBus(b.val());
-  });
-  filter.setBuses(buses);
-});
-
-f.on("child_changed", function(s) {
-	var name = s.name(),
-	busMarker = buses[name].marker;
-	if (typeof busMarker === 'undefined')
-	{
-		newBus(s.val());
-	} 
-	else
-	{
-		buses[name].info = s.val();
-		if (buses[name].contentWindow)
-		{
-			var  block = '<br>Block:' + s.val().block || '';
-			var content = 'Route: ' + s.val().route + '<br>Vehicle #: ' + name + block + '<br>' + s.val().destination,
-			infoPosition = new google.maps.LatLng(s.val().lat, s.val().lon);
-			//buses[name].contentWindow.setPosition(infoPosition);
-			buses[name].contentWindow.setContent(content);
-			buses[name].contentWindow.animatedMoveTo(s.val().lat, s.val().lon);
-		}
-		//UPDATE MARKER ICON IF BUS ROUTE CHANGES
-		var routeText = s.val().route,
-		directionColor = '7094FF';
-		if (routeMods[s.val().route])
-	    {
-	    	directionColor = routeMods[routeText].color;
-	    	routeText = routeMods[routeText].text;
-	    }
-		busMarker.setIcon('http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bbT|'+routeText+'|' + directionColor + '|eee');
-		busMarker.animatedMoveTo(s.val().lat,s.val().lon);
-	}
-
-	filter.setBuses(buses);
-});
-
-f.on("child_removed", function(s) {
-	var name = s.name(),
-	busMarker = buses[name].marker,
-	infoWindow = buses[name].contentWindow;
-
-	if (typeof busMarker !== 'undefined') {
-		busMarker.setMap(null);
-		if (infoWindow)
-		{
-			infoWindow.setMap(null);
-		}
-		//Probably shouldn't delete, just need to splice it out for GC to work
-		delete buses[name];
-	}
-});
-
-var about = (function(toggleid, id)
-{
-	var eToggle = document.getElementById(toggleid),
-	eShow = document.getElementById(id);
-	function init()
-	{
-		var children = eShow.children,
-		childrenLength = children.length;
-		eShow.style.display = 'none';
-		eToggle.addEventListener('click', toggle);
-		for(var i = 0; i < childrenLength; i++) {
-			if (children[i].className.indexOf('close') !== -1)
-			{
-				children[i].addEventListener('click', toggle);
-				break;
-			}
-		}
-	}
-
-	function toggle(e)
-	{
-		about.setStyle((about.getHidden() ? 'block' : 'none'));
-		e.preventDefault();
-	}
-	function getHidden()
-	{
-		return eShow.style.display === 'none' ? true : false;
-	}
-	function setStyle(style)
-	{
-		eShow.style.display = style;
-	}
-
-	return {
-		init: init,
-		getHidden: getHidden,
-		setStyle: setStyle
-	}
-}('abouttog','about'));
-about.init();
+pdxlivebus.init();

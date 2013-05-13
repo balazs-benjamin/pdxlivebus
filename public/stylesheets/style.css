@@ -1,24 +1,10 @@
 html { height: 100% }
 body { height: 100%; margin: 0; padding: 0;  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
 #map_canvas { height: 100%; width:100%; }
-#outbound { background-color: #7094FF; }
-#inbound { background-color: #FF6262; }
-#about { z-index: 9000; position: absolute; display:none; right: 25px; top: 60px; background: #eee; font-family: sans-serif; width: 300px; padding: 1em; opacity: 0.85; }
-#abouttog
-{
-	width:90px;
-	background: #eee;
-	position: absolute;
-	left:50%;
-	top:0;
-	margin-left:-45px;
-	color:#333;
-	text-align: center;
-	padding: 5px 15px;
-	box-shadow: 1px 1px 2px rgba(0,0,0,.25);
-}
+.outbound { background-color: #7094FF; }
+.inbound { background-color: #FF6262; }
 .down {
-color:#FF6262;
+	color:#FF6262;
 }
 .up {
 	color:#7094FF;
@@ -31,9 +17,193 @@ color:#FF6262;
 	font-weight: bold;
 	cursor: pointer;
 }
+
+
+.busmarker
+{
+	border:1px solid #000;
+	border-radius: 5px;
+	color: #FFF;
+	font-size: 1.3em;
+	width:30px !important;
+	height:30px !important;
+}
+
+.busmarker span 
+{
+	width:100%;
+	height: 100%;
+	line-height: 30px;
+	display:block;
+	text-align: center;
+}
+
+.train 
+{
+	width:40px!important;
+}
+.blue-max
+{
+	background-color: #0F6AAC;
+}
+.yellow-max
+{
+	background-color: #FFC524;
+}
+
+.green-max
+{
+	background-color: #028953;
+}
+.red-max
+{
+	background-color: #D31F43;
+}
+
+/* MENU */
+
+.aicon
+{
+	width: 50px;
+	height: 50px;
+	background: #FFF;
+
+}
+.menuicon 
+{
+	position: absolute;
+	left:0;
+	top:0;
+	border: 3px solid #F43C12;
+	-moz-user-select: none;
+    background: url("../images/hamburger.gif") no-repeat scroll 50% 50% #F43C12;
+    display: block;
+    float: right;
+    overflow: hidden;
+    text-indent: -9999px;
+}
+.searchicon 
+{
+	position: absolute;
+	right:0;
+	top:0;
+}
+/* MENU POP UP */
+
+/* FOLLOW BUS */
+.statusbar 
+{
+	width: 100%;
+	height:40px;
+	padding: 5px;
+	box-sizing: border-box;
+	display:none;
+}
+.followbus
+{
+	position: absolute;
+	bottom: 0;
+	left:0;
+	right: 0;
+	background: #FFF;
+	color: #000;
+	border-top: 3px solid #F43C12;
+}
+.followbus .close
+{
+	float: right;
+	padding: 5px;
+}
+
+.menu {
+	width: 450px;
+	display:inline-block;
+}
+
+.menu-option
+{
+	display: block;
+	float:left;
+	border: 1px solid #666;
+	min-width: 125px;
+	text-align: center;
+	min-height: 125px;
+	box-sizing: border-box;
+}
+.menu-option.selected
+{
+	background-color: #FDC903;
+}
+.menu-option-full
+{
+	width:100%;
+	clear:both;
+	border: none;
+
+}
+.menu-option a 
+{
+	color:#002C37;
+	display: block;
+	text-decoration: none;
+	padding-top: 75%;
+}
+
+.bus-menu
+{
+	background: url("../images/icons/Bus.png") no-repeat scroll 50% 50% #FFF;
+}
+.max-menu
+{
+	background: url("../images/icons/Train.png") no-repeat scroll 50% 50% #FFF;
+}
+.sc-menu
+{
+	background: url("../images/icons/Tram.png") no-repeat scroll 50% 50% #FFF;
+	clear:left;
+}
+.about-menu
+{
+	background: url("../images/icons/Information.png") no-repeat scroll 50% 50% #FFF;
+
+}
+.route-selection
+{
+	margin-top: 10px;
+	text-align: left;
+}
+.route-selection select {
+	min-width: 250px;
+	margin: 0;
+	padding: 0;
+}
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
-	#about 
+	/*
+	.busmarker 
 	{
-		display:none;
+		width: 50px !important;
+		height: 50px !important;
+	}
+	.busmarker span 
+	{
+		line-height: 50px;
+	}
+	.aicon
+	{
+		width: 150px;
+		height: 150px;
+	}*/
+	.menu 
+	{
+		width: 300px;
+	}
+
+	.statusbar
+	{
+		height:150px;
+	}
+	.followbus
+	{
+		font-size: 3em;
 	}
 }
