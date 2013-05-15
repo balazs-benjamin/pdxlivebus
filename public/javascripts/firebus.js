@@ -12,9 +12,10 @@ var pdxlivebus = (function(window, document, Firebase, L,  undefined)
 	'100': {color:'blue-max train', text: 'MAX'},
 	'190': {color:'yellow-max train', text: 'MAX'},
 	'200': {color:'green-max train', text: 'MAX'},
-	'193': {color:'000000',  text: 'SC'},
-	'194': {color:'000000',  text: 'SC'},
-	'90': {color:'red-max train', text:'MAX'}
+	'193': {color:'street-car',  text: 'SC'},
+	'194': {color:'street-car',  text: 'SC'},
+	'90': {color:'red-max train', text:'MAX'},
+	'SC': {color:'street-car', text: 'SC'}
 	},
 	center = new L.LatLng(45.525292,-122.668197),
 	toggles = {
@@ -91,7 +92,7 @@ var pdxlivebus = (function(window, document, Firebase, L,  undefined)
 
 		var markerLocation = new L.LatLng(vehicle.lat, vehicle.lon),
 		icon = L.divIcon({className: 'busmarker ' + classDirection, html: '<span>' + displayText + '</span>'}),
-		marker = new L.Marker(markerLocation,{icon:icon}).addTo(map);
+		marker = new L.AnimatedMarker([markerLocation],{icon:icon}).addTo(map);
 		marker.on('click', trackVehicle);
 		marker.on('move', trackVehicle);
 		buses[name].marker = marker;
@@ -127,14 +128,11 @@ var pdxlivebus = (function(window, document, Firebase, L,  undefined)
 			var busMarker = buses[name].marker;
 			buses[name].info = s.val();
 
-			var toLocation = new L.LatLng(s.val().lat, s.val().lon),
-			fromLocation = busMarker.getLatLng(),
-			chunked = chunLats([toLocation, fromLocation]);
-
-			animateMarker(busMarker, chunked);
-			/*var point = map.latLngToLayerPoint(location);
+			var toLocation = new L.LatLng(s.val().lat, s.val().lon);
+			//busMarker.animateTo(toLocation);
+			var point = map.latLngToLayerPoint(toLocation);
 			var fx = new L.PosAnimation();
-			fx.run(busMarker._icon, point, .25);*/
+			fx.run(busMarker._icon, point, 7);
 		}
 
 	}

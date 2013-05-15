@@ -5,7 +5,8 @@
   , path = require('path')
   , Firebase = require('firebase')
   , request = require('request')
-  , xml2js = require('xml2js');
+  , xml2js = require('xml2js')
+  , moment = require('moment');
   
  
   var fbref = new Firebase('https://livemet.firebaseio.com/');
@@ -35,7 +36,6 @@ function loadConfig() {
 }
 
 loadConfig()
-console.log(config.appid);
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
@@ -89,6 +89,8 @@ function processResults (results, scresults)
         temp.route = bus.routeNumber;
         temp.direction = bus.direction;
         temp.expires = bus.expires;
+        temp.lasttime = bus.time;
+
         if (bus.tripID) {
           temp.tripnumber = bus.tripID;
         }
@@ -106,9 +108,35 @@ function processResults (results, scresults)
   {
     console.log(results);
   }
+  
   if (scresults)
   {
-    
+    xml2js.parseString(scresults, function(err, result)
+    {
+      if (!err)
+      {
+        if(result && result.body && result.body.vehicle) {
+          var i = 0;
+          result.body.vehicle.forEach(function(item) {
+            var vehicle = item['$'];
+            if(vehicle && vehicle.id) {
+              var temp = {};
+              temp.busID = 'sc'+vehicle.id;
+              temp.lat = vehicle.lat;
+              temp.lon = vehicle.lon;
+              temp.route = 'SC';
+              temp.direction = 0;
+              temp.tripnumber = 0;
+              temp.block = 0;
+              temp.destination = '';
+              fbref.child('port').child('sc'+vehicle.id).set(temp);
+              temp = null;
+            }
+            i++;
+          });
+        }
+      }
+    });
   }
   else
   {
@@ -116,7 +144,6 @@ function processResults (results, scresults)
   }
 };
 function queryTrimet(cb) {
-    console.log(config.appid);
   var d = new Date(),
   rUrl = 'http://developer.trimet.org/beta/v2/vehicles?appid=' + config.appid + '&showNonRevenue=false';
   rSCUrl = 'http://webservices.nextbus.com/service/publicXMLFeed?command=vehicleLocations&a=portland-sc&t=' + d.getTime();

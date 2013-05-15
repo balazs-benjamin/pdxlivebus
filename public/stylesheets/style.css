@@ -59,6 +59,10 @@ body { height: 100%; margin: 0; padding: 0;  font: 14px "Lucida Grande", Helveti
 {
 	background-color: #D31F43;
 }
+.street-car
+{
+	background-color:#000;
+}
 
 /* MENU */
 
