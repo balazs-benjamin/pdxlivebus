@@ -1,0 +1,102 @@
+<! DOCTYPE html>
+<html ng-app="LiveBus">
+	<head>
+        <title>PDX LiveBus</title>
+        <meta http-equiv="x-ua-compatible" content="IE=edge" />
+        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-touch-fullscreen" content="yes">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6/leaflet.css" />
+		<!--[if lte IE 8]>
+		    <link rel="stylesheet" href="components/leaflet/dist/leaflet.ie.css" />
+		<![endif]-->
+		
+		<link rel="stylesheet" type="text/css" href="components/snapjs/snap.css">
+        <link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+        <link rel="stylesheet" type="text/css" href="stylesheets/bootstrap.min.css">
+
+		<script src="components/angular/angular.min.js"></script>
+        <script src="components/angular-cookies/angular-cookies.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/0.6/leaflet.js"></script>
+		
+        <script src="components/snapjs/snap.js"></script>
+    	<script src="https://cdn.firebase.com/v0/firebase.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angularFire/0.1.0/angularfire.min.js"></script>
+		<script src="components/angular-leaflet/src/angular-leaflet-directive.js"></script>
+
+	</head>
+
+	<body ng-controller="MapCtrl">
+    <div id="myModal" class="modal hide" style="display:none;">
+        <div class="modal-header">
+            <h3>Welcome to PDX LiveBus</h3>
+        </div>
+        <div class="modal-body">
+            <h4>Select a route below to view the buses in realtime. Your selection will be saved for the future(this will only appear once).</h4>
+            <select id="routes" ng-change="routeChange()" ng-model="routeSelection">
+                <option value="">Select a Route</option>
+                <option value="">All Routes</option>
+                <% for(route in routes) { %>
+                    <option value="<%= routes[route].route %>">
+                            <%= routes[route].name %>
+                    </option>
+                <% } %>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" modal-close="myModal">Close</a>
+        </div>
+    </div>
+
+		<div class="snap-drawers">
+            <div class="snap-drawer snap-drawer-left">
+                <div>
+                    <h3>PDX LiveBus</h3>
+                    <div class="search">
+                        <!--<input type="text" placeholder="Search" id="search" ng-model="search" ng-change="filterVehicles()">-->
+                    </div>
+                    <ul>
+                        <li><a>Map View</a></li>
+                        <li><a>Route View</a></li>
+                        <li>
+                            <select id="routes" ng-change="routeChange()" ng-model="routeSelection">
+                                <option value="">All Routes</option>
+                                <% for(route in routes) { %>
+                                    <option value="<%= routes[route].route %>">
+                                            <%= routes[route].name %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </li>
+                    </ul>
+                    <div>
+                        <p>Data courtesy of TriMet, and NextBus. Built with Leaflet.JS + FireBase + Node.JS</p>
+                        Created by <a href="https://twitter.com/browniefed" class="twitter-follow-button" data-show-count="false">Follow @browniefed</a>
+                        <div>100% open source 
+ <iframe width="85px" height="20px" frameborder="0" scrolling="0" allowtransparency="true" src="http://ghbtns.com/github-btn.html?user=browniefed&repo=livemet&am&type=watch&count=true"></iframe></div>
+                    </div>
+                </div>
+            </div>
+            <div class="snap-drawer snap-drawer-right"></div>
+        </div>
+        
+        <div id="content" class="snap-content" >
+            <div id="toolbar">
+                <a href="#" id="open-left"></a>
+                <!--<ul class="toolbar_opts">
+                    <li>
+                        <a href="" id="map_opt">Map</a>
+                    </li>
+                    <li>
+                        <a href="" id="route_opt">Routes</a>
+                    </li>
+                </ul>-->
+            </div>
+            <div ng-view>
+             <leaflet center="center" markers="markers" defaults="defaults"></leaflet>
+            </div>
+        </div>
+        <script src="javascripts/livebus.js"></script>
+
+	</body>
+</html>

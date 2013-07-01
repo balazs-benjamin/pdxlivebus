@@ -1,0 +1,9 @@
+{
+  "name": "angular-leaflet",
+  "version": "0.0.0",
+  "commit": "8adc0d3f97daa8d74e3339709db7a312f9669f48",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tombatossals/angular-leaflet-directive.git"
+  }
+}
