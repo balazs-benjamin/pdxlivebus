@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
   marker: {
     borderWidth: 1,
     borderColor: '#FFF',
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 30
+    borderRadius: 40
   },
   text: {
     color: '#FFF',
