@@ -7,7 +7,7 @@ module.exports = {
   devtool: '#eval-source-map',
   entry: [
     'webpack-hot-middleware/client',
-    './app/index.js'
+    './index.web.js'
   ],
   output: {
     path: __dirname,
@@ -31,7 +31,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel',
-        include: path.join(__dirname, 'app'),
+        exclude: /node_modules/,
         query: {
           "presets": ["es2015","react"],
           "plugins": [

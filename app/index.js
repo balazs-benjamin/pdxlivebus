@@ -1,6 +1,6 @@
-import React from "react";
-import { render } from "react-dom";
-import "./polyfill";
+import React, { Component } from "react";
+import App from "./containers/app";
+
 import thunk from 'redux-thunk';
 import { createStore, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
@@ -11,10 +11,19 @@ const store = createStore(
   applyMiddleware(thunk)
 );
 
-import App from "./containers/app";
-
-render(
+const AppProvider = (
   <Provider store={store}>
     <App />
   </Provider>
-  , document.getElementById('root'));
+)
+
+
+class Main extends Component {
+  render() {
+    return (
+      AppProvider
+    )
+  }
+}
+
+export default Main;

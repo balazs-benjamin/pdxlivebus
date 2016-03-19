@@ -19,7 +19,7 @@
     "react-dom": "^0.14.7",
     "react-leaflet": "^0.10.2",
     "react-native": "^0.21.0",
-    "react-native-maps": "^0.3.0",
+    "react-native-maps": "github:lelandrichardson/react-native-maps",
     "react-redux": "^4.4.1",
     "redux": "^3.3.1",
     "redux-thunk": "^2.0.1",
