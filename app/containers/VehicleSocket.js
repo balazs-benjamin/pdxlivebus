@@ -8,13 +8,11 @@ if (window.navigator && Object.keys(window.navigator).length == 0) {
   window = Object.assign(window, { navigator: { userAgent: 'ReactNative' }});
 }
 
-
 var io = require("socket.io-client/socket.io");
 
 
 class VehicleSocket extends Component {
   componentDidMount() {
-    // this.socket = io('http://localhost:3001');
     this.socket = io('http://pdxlivebus.azurewebsites.net/', {
       transports: ['websocket']
     });
