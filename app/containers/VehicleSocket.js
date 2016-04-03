@@ -13,7 +13,7 @@ var io = require("socket.io-client/socket.io");
 
 class VehicleSocket extends Component {
   componentDidMount() {
-    this.socket = io('http://pdxlivebus.azurewebsites.net/', {
+    this.socket = io('http://pdx-livebus.rhcloud.com/', {
       transports: ['websocket']
     });
     this.socket.on('vehicles_update', (data) => this.props.actions.updateVehicles(data));
