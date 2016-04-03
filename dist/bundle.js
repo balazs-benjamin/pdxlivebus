@@ -23171,7 +23171,7 @@
 	    value: function componentDidMount() {
 	      var _this2 = this;
 
-	      this.socket = io('http://pdx-livebus.rhcloud.com/', {
+	      this.socket = io('http://pdx-livebus.rhcloud.com:8000', {
 	        transports: ['websocket']
 	      });
 	      this.socket.on('vehicles_update', function (data) {
