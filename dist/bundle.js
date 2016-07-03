@@ -23152,7 +23152,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	if (window.navigator && (0, _keys2.default)(window.navigator).length == 0) {
+	if (window.navigator && (0, _keys2.default)(window.navigator).length == 0 && !document) {
 	  window = (0, _assign2.default)(window, { navigator: { userAgent: 'ReactNative' } });
 	}
 
