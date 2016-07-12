@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import * as vehicleActions from "../actions/vehicles";
 
 
-if (window.navigator && Object.keys(window.navigator).length == 0 && !document) {
+if (window.navigator && Object.keys(window.navigator).length == 0 && !window.document) {
   window = Object.assign(window, { navigator: { userAgent: 'ReactNative' }});
 }
 
